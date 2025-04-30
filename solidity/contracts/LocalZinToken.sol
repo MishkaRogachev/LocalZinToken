@@ -6,15 +6,22 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract LocalZinToken is ERC20, Ownable {
+    address public minter;
+
     constructor(
-        address recipient,
         address initialOwner
-    ) ERC20("Local Zin Token", "LZK") Ownable(initialOwner) {
-        // Mint 100,000 tokens to the recipient
-        _mint(recipient, 100_000 * 10 ** decimals());
+    ) ERC20("Local Zin Token", "LZK") Ownable(initialOwner) {}
+
+    // @dev Set an address authorized to mint tokens
+    function setMinter(address _minter) external onlyOwner {
+        minter = _minter;
     }
 
-    function mint(address to, uint256 amount) public onlyOwner {
+    function mint(address to, uint256 amount) external {
+        require(
+            msg.sender == minter,
+            "Only minter is authorized for mining tokens"
+        );
         _mint(to, amount);
     }
 }

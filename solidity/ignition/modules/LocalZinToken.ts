@@ -4,7 +4,7 @@
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
 const LocalZinTokenModule = buildModule("LocalZinTokenModule", (m) => {
-  const initialOwner = m.getAccount(0); // deployer will be owner
+  const initialOwner = m.getAccount(0);
 
   const token = m.contract("LocalZinToken", [initialOwner]);
 

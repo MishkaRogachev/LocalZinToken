@@ -1,19 +1,16 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
-const PREMINT_AMOUNT = ethers.parseUnits("100000", 18);
-
 describe("LocalZinToken", function () {
   // We define a fixture to reuse the same setup in every test.
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
   async function deployTokenFixture() {
-    const [recipient, owner, otherAccount] = await ethers.getSigners();
+    const [owner, minter, otherAccount] = await ethers.getSigners();
     const Token = await ethers.getContractFactory("LocalZinToken");
+    const token = await Token.deploy(owner.address);
 
-    const token = await Token.deploy(recipient.address, owner.address);
-
-    return { token, recipient, owner, otherAccount };
+    return { token, owner, minter, otherAccount };
   }
 
   it("should assign ownership correctly", async function () {
@@ -21,31 +18,31 @@ describe("LocalZinToken", function () {
     expect(await token.owner()).to.equal(owner.address);
   });
 
-  it("should premint 100,000 tokens to recipient", async function () {
-    const { token, recipient } = await deployTokenFixture();
-    const balance = await token.balanceOf(recipient.address);
-    expect(balance).to.equal(PREMINT_AMOUNT);
-  });
-
-  it("should allow owner to mint", async function () {
-    const { token, owner } = await deployTokenFixture();
+  it("should allow authorized minter to mint", async function () {
+    const { token, owner, minter } = await deployTokenFixture();
     const mintAmount = ethers.parseEther("1000");
 
-    await token.connect(owner).mint(owner.address, mintAmount);
-    const balance = await token.balanceOf(owner.address);
-    expect(balance).to.equal(mintAmount);
+    await token.connect(owner).setMinter(minter.address);
+    await token.connect(minter).mint(minter.address, mintAmount);
 
-    const totalSupply = await token.totalSupply();
-    expect(totalSupply).to.equal(PREMINT_AMOUNT + mintAmount);
+    const balance = await token.balanceOf(minter.address);
+    expect(balance).to.equal(mintAmount);
   });
 
-  it("should not allow non-owner to mint", async function () {
+  it("should reject mint from unauthorized address", async function () {
     const { token, otherAccount } = await deployTokenFixture();
     const mintAmount = ethers.parseEther("1000");
 
     await expect(
       token.connect(otherAccount).mint(otherAccount.address, mintAmount)
-    ).to.be.revertedWithCustomError(token, "OwnableUnauthorizedAccount")
-     .withArgs(otherAccount.address);
+    ).to.be.revertedWith("Only minter is authorized for mining tokens");
+  });
+
+  it("should only allow owner to set minter", async function () {
+    const { token, minter, otherAccount } = await deployTokenFixture();
+
+    await expect(
+      token.connect(otherAccount).setMinter(minter.address)
+    ).to.be.revertedWithCustomError(token, "OwnableUnauthorizedAccount");
   });
 });
