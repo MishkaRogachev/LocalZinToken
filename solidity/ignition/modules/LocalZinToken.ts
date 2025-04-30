@@ -1,0 +1,14 @@
+// This setup uses Hardhat Ignition to manage smart contract deployments.
+// Learn more about it at https://hardhat.org/ignition
+
+import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
+
+const LocalZinTokenModule = buildModule("LocalZinTokenModule", (m) => {
+  const initialOwner = m.getAccount(0); // deployer will be owner
+
+  const token = m.contract("LocalZinToken", [initialOwner]);
+
+  return { token };
+});
+
+export default LocalZinTokenModule;
