@@ -1,5 +1,8 @@
 # Local Zin Token
 
+[![CI](https://github.com/MishkaRogachev/LocalZinToken/actions/workflows/solidity.yml/badge.svg)](https://github.com/MishkaRogachev/LocalZinToken/actions)
+[![CI](https://github.com/MishkaRogachev/LocalZinToken/actions/workflows/stylus.yml/badge.svg)](https://github.com/MishkaRogachev/LocalZinToken/actions)
+
 ERC-20 token used to distribute magazine-branded tokens (“LZT”) via on-chain QR airdrop.
 
 ## Solidity
@@ -14,7 +17,7 @@ npx hardhat node
 npx hardhat ignition deploy ./ignition/modules/LocalZinToken.ts
 ```
 
-## Stylus (coming soon)
+## Stylus
 
 The Stylus part responsible for claim codes registry and handles claim mechanics
 
