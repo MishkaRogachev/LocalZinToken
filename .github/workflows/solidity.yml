@@ -10,6 +10,10 @@ on:
       - 'solidity/**'
       - '.github/workflows/solidity.yml'
 
+env:
+  ARBITRUM_MAINNET_RPC: ${{ secrets.ARBITRUM_MAINNET_RPC }}
+  ARBITRUM_SEPOLIA_RPC: ${{ secrets.ARBITRUM_SEPOLIA_RPC }}
+
 jobs:
   test:
     runs-on: ubuntu-latest

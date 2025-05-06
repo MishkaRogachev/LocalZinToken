@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npx hardhat test"
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "check-env": "npx tsx scripts/check-env.ts",
+    "deploy:devnet": "npx hardhat run --network arbitrumSepolia scripts/deploy.ts",
+    "deploy:mainnet": "npx hardhat run --network arbitrumMainnet scripts/deploy.ts"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +18,7 @@
     "hardhat": "^2.23.0"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.3.0"
+    "@openzeppelin/contracts": "^5.3.0",
+    "dotenv": "^16.5.0"
   }
 }
