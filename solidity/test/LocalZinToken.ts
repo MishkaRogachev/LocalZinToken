@@ -18,23 +18,61 @@ describe("LocalZinToken", function () {
     expect(await token.owner()).to.equal(owner.address);
   });
 
-  it("should allow authorized minter to mint", async function () {
-    const { token, owner, minter } = await deployTokenFixture();
-    const mintAmount = ethers.parseEther("1000");
-
-    await token.connect(owner).setMinter(minter.address);
-    await token.connect(minter).mint(minter.address, mintAmount);
-
-    const balance = await token.balanceOf(minter.address);
-    expect(balance).to.equal(mintAmount);
-  });
-
-  it("should reject mint from unauthorized address", async function () {
-    const { token, otherAccount } = await deployTokenFixture();
+  it("should reject mint with no minter set", async function () {
+    const { token, owner } = await deployTokenFixture();
     const mintAmount = ethers.parseEther("1000");
 
     await expect(
-      token.connect(otherAccount).mint(otherAccount.address, mintAmount)
+      token.connect(owner).mint(owner.address, mintAmount)
+    ).to.be.revertedWith("Minter should be set before minting");
+  });
+
+  it("should allow owner to set minter and emit event", async function () {
+    const { token, owner, minter } = await deployTokenFixture();
+
+    await expect(token.connect(owner).setMinter(minter.address))
+      .to.emit(token, "MinterSet")
+      .withArgs(minter.address);
+
+    expect(await token.minter()).to.equal(minter.address);
+  });
+  
+  it("should reject setting minter to zero address", async function () {
+    const { token, owner } = await deployTokenFixture();
+
+    await expect(
+      token.connect(owner).setMinter(ethers.ZeroAddress)
+    ).to.be.revertedWith("Minter cannot be the zero address");
+  });
+
+  it("should reject setting minter to current minter", async function () {
+    const { token, owner, minter } = await deployTokenFixture();
+
+    await token.connect(owner).setMinter(minter.address);
+
+    await expect(
+      token.connect(owner).setMinter(minter.address)
+    ).to.be.revertedWith("Minter is already set to this address");
+  });
+  
+  it("should only allow owner to set minter", async function () {
+    const { token, minter, otherAccount } = await deployTokenFixture();
+
+    await expect(
+      token.connect(otherAccount).setMinter(minter.address)
+    ).to.be.revertedWithCustomError(token, "OwnableUnauthorizedAccount");
+  });
+
+  it("should reject mint from unauthorized address", async function () {
+    const { token, owner, minter } = await deployTokenFixture();
+
+    await expect(token.connect(owner).setMinter(minter.address))
+      .to.emit(token, "MinterSet")
+      .withArgs(minter.address);
+
+    const mintAmount = ethers.parseEther("1000");
+    await expect(
+      token.connect(owner).mint(minter.address, mintAmount)
     ).to.be.revertedWith("Only minter is authorized for mining tokens");
   });
 
