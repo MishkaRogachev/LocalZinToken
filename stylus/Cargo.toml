@@ -6,7 +6,7 @@ license = "MIT"
 homepage = "https://github.com/MishkaRogachev/LocalZinToken"
 repository = "https://github.com/MishkaRogachev/LocalZinToken"
 keywords = ["arbitrum", "ethereum", "stylus", "alloy"]
-description = "Stylus hello world example"
+description = "Airdrop contract for LocalZinToken on Arbitrum Stylus"
 
 [dependencies]
 alloy-primitives = "=0.8.20"
@@ -28,7 +28,7 @@ export-abi = ["stylus-sdk/export-abi"]
 debug = ["stylus-sdk/debug"]
 
 [[bin]]
-name = "stylus-hello-world"
+name = "local-zin-airdrop"
 path = "src/main.rs"
 
 [lib]
