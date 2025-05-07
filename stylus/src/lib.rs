@@ -41,6 +41,11 @@ impl LocalZinAirdrop {
         Ok(())
     }
 
+    /// Get the owner of the contract
+    pub fn get_owner(&self) -> Address {
+        self.owner.get()
+    }
+
     /// Set the address of LocalZinToken mint contract (only owner)
     pub fn set_token_address(&mut self, token: Address) -> Result<(), Vec<u8>> {
         self.ensure_owner()?;
@@ -53,6 +58,17 @@ impl LocalZinAirdrop {
         self.ensure_owner()?;
 
         self.claim_codes.setter(code_hash).set(true);
+        Ok(())
+    }
+
+    /// Register multiple code hashes at once (only owner)
+    pub fn register_codes(&mut self, code_hashes: Vec<B256>) -> Result<(), Vec<u8>> {
+        self.ensure_owner()?;
+
+        for code_hash in code_hashes {
+            self.claim_codes.setter(code_hash).set(true);
+        }
+
         Ok(())
     }
 
@@ -72,7 +88,9 @@ impl LocalZinAirdrop {
     pub fn can_claim(&self, code_hash: B256) -> bool {
         self.claim_codes.get(code_hash)
     }
+}
 
+impl LocalZinAirdrop {
     fn ensure_owner(&self) -> Result<(), Vec<u8>> {
         if self.owner.get() != self.vm().msg_sender() {
             Err(b"Only owner".to_vec())
