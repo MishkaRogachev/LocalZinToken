@@ -25,6 +25,7 @@ Once installed, install project dependencies:
 ```shell
 cd ./solidity
 npm install
+npm install -g solc
 ```
 
 2. Rust toolchain with wasm target
@@ -71,9 +72,15 @@ npx hardhat ignition deploy ./ignition/modules/LocalZinToken.ts
 
 The Stylus part responsible for claim codes registry and handles claim mechanics
 
-
+1. Build and test the project
 ```shell
 cd ./stylus
 cargo test
 cargo stylus check
+```
+
+2. Export contract ABI
+```shell
+cargo stylus export-abi
+npx solc --abi ./abi/local_zin_airdrop.sol -o abi
 ```
