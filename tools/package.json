@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "generate-codes": "npx tsx scripts/generate-codes.ts"
+    "generate-codes": "npx tsx scripts/generate-codes.ts",
+    "register-codes": "npx tsx scripts/register-codes.ts",
+    "init-contracts": "npx tsx scripts/init-contracts.ts",
+    "integration-test": "npx tsx scripts/integration-test.ts"
   },
   "keywords": [],
   "author": "",

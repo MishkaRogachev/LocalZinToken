@@ -10,7 +10,7 @@ async function main() {
   const contract = await Token.deploy(deployer.address);
   await contract.waitForDeployment();
 
-  console.log(`✅ Token deployed at: ${await contract.getAddress()}`);
+  console.log(`Token deployed at: ${await contract.getAddress()}`);
   console.log(`Owner: ${await contract.owner()}`);
   console.log(`Name: ${await contract.name()}`);
   console.log(`Symbol: ${await contract.symbol()}`);
@@ -19,11 +19,11 @@ async function main() {
   if (minter !== ethers.ZeroAddress) {
     console.log(`Minter already set to: ${minter}`);
   } else {
-    console.log(`ℹ️ Minter not set yet`);
+    console.log(`Minter not set yet`);
   }
 }
 
 main().catch((error) => {
-  console.error("❌ Deployment failed:", error);
+  console.error("Deployment failed:", error);
   process.exitCode = 1;
 });

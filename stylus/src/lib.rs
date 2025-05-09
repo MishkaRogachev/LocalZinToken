@@ -8,7 +8,7 @@ use stylus_sdk::{
 };
 
 // Amount of tokens to airdrop
-const TOKENS_TO_AIRDROP: u64 = 1000;
+const TOKENS_TO_AIRDROP: u128 = 1_000_000_000_000_000_000_000; // 1000 * 10^18
 const MAX_CODES_TO_REGISTER: usize = 500;
 
 sol_interface! {
