@@ -14,8 +14,8 @@ const {
 
 // === Config ===
 export const IS_DEVNET = true;
-export const TOKEN_ADDRESS = "0x6cB5AA5EE9eF0BF6b582f0617128893715C8F05A";         // Replace with actual token address
-export const AIRDROP_ADDRESS = "0x44fa600b852047959af2e4f5b416bab27720ddf8";       // Replace with actual stylus contract address
+export const TOKEN_ADDRESS = "0x01cf3bFA6C2658c4D2ceD4E31e5a9880Ca5D742C";         // Replace with latest solidity contract address
+export const AIRDROP_ADDRESS = "0x30f90205bacbe0da967091d08f37166ec9c06e23";       // Replace with latest stylus contract address
 
 const RPC_URL = IS_DEVNET ? ARBITRUM_SEPOLIA_RPC! : ARBITRUM_MAINNET_RPC!;
 export const provider = new ethers.JsonRpcProvider(RPC_URL);

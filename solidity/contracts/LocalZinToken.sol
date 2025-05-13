@@ -13,7 +13,7 @@ contract LocalZinToken is ERC20, Ownable {
 
     constructor(
         address initialOwner
-    ) ERC20("Local Zin Token", "LZK") Ownable(initialOwner) {}
+    ) ERC20("local zin token", "lzk") Ownable(initialOwner) {}
 
     // @dev Set an address authorized to mint tokens
     function setMinter(address _minter) external onlyOwner {

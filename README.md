@@ -3,8 +3,7 @@
 [![CI](https://github.com/MishkaRogachev/LocalZinToken/actions/workflows/solidity.yml/badge.svg)](https://github.com/MishkaRogachev/LocalZinToken/actions)
 [![CI](https://github.com/MishkaRogachev/LocalZinToken/actions/workflows/stylus.yml/badge.svg)](https://github.com/MishkaRogachev/LocalZinToken/actions)
 
-ERC-20 token used to distribute magazine-branded tokens (“LZT”) via on-chain QR airdrop.
-
+ERC-20 token used to distribute magazine-branded tokens (lzt) via on-chain QR airdrop.
 
 ## Building & testing
 
@@ -41,10 +40,10 @@ cargo install stylus-cli
 
 ### Enviroment setup
 
-1. Create an Ethereum wallet using [MetaMask](https://metamask.io/) or any preferred tool. Export your private key.
-2. Send at least 0.001 ETH on Ethereum Arbitrum on your wallet address. Yo can use [bridge](https://bridge.arbitrum.io/) to transfer your founds from Ethereum Mainnet. (It will take about 15 minutes)
+1. Create an Ethereum wallet using [MetaMask](https://metamask.io/) or any preferred tool. Export your private key
+2. Send at least 0.001 ETH on Ethereum Arbitrum on your wallet address. Yo can use [bridge](https://bridge.arbitrum.io/) to transfer your founds from Ethereum Mainnet (It will take about 15 minutes)
 3. Send some testnet ETH using [Arbitrum Sepolia Faucet](https://www.alchemy.com/faucets/arbitrum-sepolia)
-2. Sign up at [Infura](https://developer.metamask.io/) and create a project to get your API key.
+2. Sign up at [Infura](https://developer.metamask.io/) and create a project to get your API key
 3. Create a .env file in the root of the project with the following content:
 
 ```
@@ -58,7 +57,7 @@ ARBITRUM_SEPOLIA_RPC=https://arbitrum-sepolia.infura.io/v3/<your_infura_api_key>
 
 ### Solidity
 
-The Solidity part responsible for core ERC-20 mechanics with ability to delegate minting to specific address.
+The Solidity part responsible for core ERC-20 mechanics with ability to delegate minting to specific address
 
 ```shell
 cd ./solidity
@@ -87,16 +86,7 @@ npx solc --abi ./abi/local_zin_airdrop.sol -o abi
 
 1. Double check `.env` in project root folder. Wallet and RPC endpoints will be used for both stylus and solidity parts.
 
-2. Deploy the Solidity contract:
-- On Arbitrum Testnet
-```shell
-npx hardhat ignition deploy ./ignition/modules/LocalZinToken.ts --network arbitrumSepolia
-```
-
-- On Arbitrum Mainnet
-```shell
-npx hardhat ignition deploy ./ignition/modules/LocalZinToken.ts --network arbitrumMainnet
-```
+2. Deploy the Solidity contract using `npm run deploy:devnet` (testnet) or `npm run deploy:mainnet` (mainnet). 
 Remember the deployed contract address!
 
 
@@ -107,7 +97,7 @@ cargo stylus deploy --endpoint "$ARBITRUM_SEPOLIA_RPC" --private-key "$PRIVATE_K
 ```
 Remember the deployed one more contract address!
 
-4. Update `tools/scripts/config.ts` with your contract addreses from previous steps.
+4. Update `tools/scripts/config.ts` with your contract addreses from previous steps
 
 5. Init contracts with script. You need to run `init-contracts` every time you change any of contract addresses
 ```
@@ -122,3 +112,4 @@ Note: for each contact pair init script works just once
 cd tools
 npm run integration-test
 ```
+7. Check your contracts using [Arbiscan](https://arbiscan.io/) bt pasting your contract addresses
