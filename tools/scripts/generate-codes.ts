@@ -6,12 +6,12 @@ import QRCode from "qrcode";
 // === Config ===
 const NUM_CODES = 1000;
 const OUTPUT_DIR = "output";
-const CLAIM_URL_PREFIX = "https://localzin.com/claim?code=";
+const CLAIM_URL_PREFIX = "https://local-zin-token.vercel.app?code=";
 
 // === Parse salt from CLI ===
 const SALT = process.argv[2];
 if (!SALT) {
-  console.error("❌ You must provide a salt as a CLI argument.");
+  console.error("You must provide a salt as a CLI argument.");
   process.exit(1);
 }
 
@@ -54,5 +54,5 @@ async function generateCodes() {
 }
 
 generateCodes().catch((err) => {
-  console.error("❌ Failed to generate codes:", err);
+  console.error("Failed to generate codes:", err);
 });
