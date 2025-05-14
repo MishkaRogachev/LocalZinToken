@@ -18,8 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MetaMask SDK Quickstart",
-  description: "MetaMask SDK Quickstart app",
+  title: "LocalZin Token Airdrop",
+  description: "Claim your LocalZin tokens",
 };
 
 export default async function RootLayout({

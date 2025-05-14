@@ -22,17 +22,20 @@ export function Navbar() {
 
   return (
     <nav className="flex w-full px-3 md:px-0 h-fit py-10 justify-between items-center">
-      <Image
-        src="/metamask-logo.svg"
-        alt="Metamask Logo"
-        width={180}
-        height={180}
-      />
+      <div className="flex items-center space-x-4">
+        <Image
+          src="/localzin-logo.png"
+          alt="Localzin Logo"
+          width={96}
+          height={96}
+        />
+        <h1 className="text-3xl font-bold text-white text-left">LOCAL ZIN TOKEN AIRDROP</h1>
+      </div>
 
       {isConnected ? (
         <div className="flex-col md:flex-row flex gap-2">
           <DropdownMenu>
-            <DropdownMenuTrigger className="bg-white h-fit md:px-3 py-2 rounded-2xl font-semibold flex justify-center  items-center gap-1">
+            <DropdownMenuTrigger className="bg-white h-fit md:px-3 py-2 rounded-2xl font-semibold flex justify-center items-center gap-1">
               {chain?.name.split(" ").slice(0, 2).join(" ")} <ChevronDown />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-full justify-center rounded-2xl">

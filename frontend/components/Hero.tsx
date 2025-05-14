@@ -11,8 +11,8 @@ export const Hero = () => {
       <section className="relative mx-auto mt-28">
         <h1 className="text-7xl text-zinc-100 font-bold">Welcome</h1>
         <p className="text-white opacity-70 text-center text-lg">
-          to the <strong>MetaMask SDK</strong> quick start app!
-          <br /> Add your functionality.
+          to the <strong>local zin token</strong> airdrop!
+          <br /> Claim your tokens now!
         </p>
         <Image
           src="/arrow.svg"
@@ -29,7 +29,7 @@ export const Hero = () => {
     <section className="relative mx-auto mt-28">
       <h1 className="text-7xl text-zinc-100 font-bold">Welcome</h1>
       <p className="text-white opacity-70 text-center text-lg">
-        to the <strong>MetaMask SDK</strong> quick start app!
+        to the <strong>local zin token</strong> airdrop!
         <br /> Connect your wallet to get started.
       </p>
       <Image
