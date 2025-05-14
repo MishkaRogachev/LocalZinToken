@@ -82,13 +82,21 @@ cargo stylus export-abi
 npx solc --abi ./abi/local_zin_airdrop.sol -o abi
 ```
 
+### Frontend
+
+Starting a development server
+
+```shell
+cd frontend
+pnpm dev
+```
+
 ### Deployment
 
 1. Double check `.env` in project root folder. Wallet and RPC endpoints will be used for both stylus and solidity parts.
 
 2. Deploy the Solidity contract using `npm run deploy:devnet` (testnet) or `npm run deploy:mainnet` (mainnet). 
 Remember the deployed contract address!
-
 
 3. Deploy the Stylus contract:
 ```shell
