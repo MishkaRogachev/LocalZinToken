@@ -16,6 +16,18 @@ async function run() {
   console.log("Initially claimable:", initial);
   if (initial) throw new Error("Code should not be claimable yet");
 
+  // Try to claim before registration (should revert)
+  console.log("Trying to claim before registration (should fail)...");
+  try {
+    await (await airdropContract.claim(codeHash)).wait();
+    throw new Error("Claim should have failed before code was registered");
+  } catch (err: any) {
+    if (!err.message.includes("reverted")) {
+      throw new Error("Unexpected error during early claim: " + err.message);
+    }
+    console.log("Claim correctly failed before registration.");
+  }
+
   // Register the code
   console.log("Registering code...");
   await (await airdropContract.registerCode(codeHash)).wait();

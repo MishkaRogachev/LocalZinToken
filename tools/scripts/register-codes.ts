@@ -1,46 +1,45 @@
+import fs from "fs";
+import path from "path";
+import { argv } from "process";
+import { airdropContract } from "./config";
 import { ethers } from "ethers";
-import * as dotenv from "dotenv";
-import * as fs from "fs";
-import * as path from "path";
-
-// Load env from root .env
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 // === Constants ===
-const CONTRACT_ADDRESS = "0xb6b444d1cb709ce248d48f0a52a8501e26264403";
-const HASHES_FILE = path.resolve(__dirname, "../generated/code_hashes.json");
+const MAX_CODES_PER_BATCH = 500;
 
-// === Load keys and RPC from env ===
-const PRIVATE_KEY = process.env.PRIVATE_KEY!;
-const RPC_URL = process.env.ARBITRUM_SEPOLIA_RPC!;
+// === Parse CLI argument ===
+const codesFlagIndex = argv.indexOf("--codes");
+if (codesFlagIndex === -1 || !argv[codesFlagIndex + 1]) {
+  console.error("Please provide --codes path/to/hashed.json");
+  process.exit(1);
+}
+const CODES_FILE = path.resolve(argv[codesFlagIndex + 1]);
 
-// === ABI for register_code ===
-const CONTRACT_ABI = [
-  {
-    inputs: [{ internalType: "bytes32", name: "code_hash", type: "bytes32" }],
-    name: "register_code",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-];
+// === Load codes ===
+let codeHashes: string[];
+try {
+  const raw = fs.readFileSync(CODES_FILE, "utf-8");
+  codeHashes = JSON.parse(raw);
+  if (!Array.isArray(codeHashes)) throw new Error("Invalid JSON format");
+} catch (err) {
+  console.error("Failed to load code hashes:", err);
+  process.exit(1);
+}
+
+console.log(`Loaded ${codeHashes.length} codes from ${CODES_FILE}`);
+console.log(`Sending in batches of ${MAX_CODES_PER_BATCH} to: ${airdropContract.target}`);
 
 async function main() {
-  const provider = new ethers.JsonRpcProvider(RPC_URL);
-  const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
-  const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, wallet);
+  for (let i = 0; i < codeHashes.length; i += MAX_CODES_PER_BATCH) {
+    const batch = codeHashes.slice(i, i + MAX_CODES_PER_BATCH);
+    const padded = batch.map((hex) => ethers.getBytes("0x" + hex));
 
-  const codeHashes: string[] = JSON.parse(fs.readFileSync(HASHES_FILE, "utf-8"));
-
-  console.log(`Registering ${codeHashes.length} QR codes to contract: ${CONTRACT_ADDRESS}`);
-
-  for (const hash of codeHashes) {
     try {
-      const tx = await contract.register_code(hash);
-      console.log(`Registered: ${hash} | TX: ${tx.hash}`);
+      const tx = await airdropContract.registerCodes(padded);
+      console.log(`Batch ${i / MAX_CODES_PER_BATCH + 1}: TX ${tx.hash}`);
       await tx.wait();
     } catch (err) {
-      console.error(`Failed to register ${hash}:`, err);
+      console.error(`Failed to register batch ${i / MAX_CODES_PER_BATCH + 1}:`, err);
     }
   }
 }
