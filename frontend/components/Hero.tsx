@@ -3,16 +3,16 @@
 import Image from "next/image";
 import { useAccount } from "wagmi";
 
+import t from '../i18n/ru.json';
+
 export const Hero = () => {
   const { isConnected } = useAccount();
 
   if (isConnected) {
     return (
       <section className="relative mx-auto mt-28">
-        <h1 className="text-7xl text-zinc-100 font-bold">Welcome</h1>
+        <h1 className="text-7xl text-zinc-100 font-bold">{t.welcome}</h1>
         <p className="text-white opacity-70 text-center text-lg">
-          to the <strong>local zin token</strong> airdrop!
-          <br /> Claim your tokens now!
         </p>
         <Image
           src="/arrow.svg"
@@ -27,10 +27,9 @@ export const Hero = () => {
 
   return (
     <section className="relative mx-auto mt-28">
-      <h1 className="text-7xl text-zinc-100 font-bold">Welcome</h1>
+      <h1 className="text-7xl text-zinc-100 font-bold">{t.welcome}</h1>
       <p className="text-white opacity-70 text-center text-lg">
-        to the <strong>local zin token</strong> airdrop!
-        <br /> Connect your wallet to get started.
+        <br /> {t.welcomeMessageNoWallet}
       </p>
       <Image
         src="/arrow.svg"

@@ -12,6 +12,8 @@ import {
 import { formatAddress } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 
+import t from '../i18n/ru.json';
+
 export function Navbar() {
   const { address, isConnected, chain } = useAccount();
   const { connect, connectors } = useConnect();
@@ -29,7 +31,7 @@ export function Navbar() {
           width={96}
           height={96}
         />
-        <h1 className="text-3xl font-bold text-white text-left">LOCAL ZIN TOKEN AIRDROP</h1>
+        <h1 className="text-3xl font-bold text-white text-left">LOCAL ZIN TOKEN</h1>
       </div>
 
       {isConnected ? (
@@ -62,7 +64,7 @@ export function Navbar() {
                 onClick={() => disconnect()}
                 className="text-red-400 cursor-pointer w-full flex justify-center rounded-2xl font-semibold"
               >
-                Disconnect
+                {t.disconnectWallet}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -72,7 +74,7 @@ export function Navbar() {
           className="bg-blue-500 rounded-xl hover:bg-blue-600 shadow-xl md:px-10 font-semibold"
           onClick={() => connect({ connector })}
         >
-          Connect Wallet
+        {t.connectWallet}
         </Button>
       )}
     </nav>

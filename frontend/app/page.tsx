@@ -13,11 +13,15 @@ import { Hero } from '@/components/Hero';
 import { AIRDROP_ADDRESS } from '../contracts/config';
 import airdropAbi from '../contracts/local_zin_airdrop.json';
 
+import t from '../i18n/ru.json';
+
 export default function ClaimPage() {
   const searchParams = useSearchParams();
 
   let codeHash = searchParams.get('code');
-  codeHash = codeHash && codeHash.startsWith("0x") ? codeHash : `0x${codeHash}`;
+  if (codeHash && !codeHash.startsWith("0x")) {
+    codeHash = `0x${codeHash}`;
+  }
 
   const { isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
@@ -78,7 +82,7 @@ export default function ClaimPage() {
               <div className="bg-blue-500 bg-opacity-20 h-[104%] w-[103%] md:h-[103%] md:w-[102%] rounded-xl -z-20 absolute right-0 bottom-0"></div>
               <div className="bg-blue-500 bg-opacity-20 h-[104%] w-[103%] md:h-[103%] md:w-[102%] rounded-xl -z-20 absolute top-0 left-0"></div>
               <CardHeader>
-                <CardTitle className="text-2xl">Claim Tokens</CardTitle>
+                <CardTitle className="text-2xl">{t.title}</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col justify-between h-full space-y-7">
                 <div className="space-y-1">
@@ -92,22 +96,18 @@ export default function ClaimPage() {
                     onClick={handleClaim}
                     disabled={!claimable || txStatus === 'pending'}
                   >
-                    {txStatus === 'pending'
-                      ? 'Claiming...'
-                      : claimable
-                      ? 'Claim'
-                      : 'Claimed!'}
+                    {txStatus === 'pending' ? t.claiming : claimable ? t.claim : t.claimed}
                   </Button>
                 ) : (
                   <p className="text-sm text-center text-white opacity-80 mt-auto">
-                    First connect your wallet
+                    {t.firstConnectYourWallet}
                   </p>
                 )}
               </CardContent>
             </Card>
           ) : (
             <p className="text-lg text-white text-center opacity-80">
-              To claim tokens, you should have a valid code.
+              {t.noCode}
             </p>
           )}
         </section>
