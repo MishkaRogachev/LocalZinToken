@@ -33,7 +33,10 @@ export default function ClaimPage() {
   const { data: walletClient } = useWalletClient();
 
   const [claimStatus, setClaimStatus] = useState<ClaimStatus | null>(null);
+  const [codeChecked, setCodeChecked] = useState(false);
+
   const [txStatus, setTxStatus] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
+  const [txHash, setTxHash] = useState<string | null>(null);
 
   const [airdropContract, setAirdropContract] = useState<ethers.Contract | null>(null);
 
@@ -53,12 +56,15 @@ export default function ClaimPage() {
 
     (async () => {
       try {
+        setCodeChecked(false);
         const result = await airdropContract.getClaimStatus(codeHash);
         console.log('Claim status:', result.toString());
-        setClaimStatus(result);
+        setClaimStatus(Number(result));
+        setCodeChecked(true);
       } catch (err) {
         console.error('Failed to check claimable status:', err);
         setClaimStatus(null);
+        setCodeChecked(true);
       }
     })();
   }, [airdropContract, codeHash]);
@@ -71,11 +77,10 @@ export default function ClaimPage() {
       const tx = await airdropContract.claim(codeHash);
       await tx.wait();
       setTxStatus('success');
-      // Update claim status
-      const result = await airdropContract.getClaimStatus(codeHash);
-      setClaimStatus(result);
+      setTxHash(tx.hash);
+      setClaimStatus(ClaimStatus.Claimed);
     } catch (err) {
-      console.error('Claim failed:', err);
+      console.error("Claim failed:", err);
       setTxStatus('error');
     }
   };
@@ -91,7 +96,7 @@ export default function ClaimPage() {
               <div className="bg-blue-500 bg-opacity-20 h-[104%] w-[103%] md:h-[103%] md:w-[102%] rounded-xl -z-20 absolute right-0 bottom-0"></div>
               <div className="bg-blue-500 bg-opacity-20 h-[104%] w-[103%] md:h-[103%] md:w-[102%] rounded-xl -z-20 absolute top-0 left-0"></div>
               <CardHeader>
-                <CardTitle className="text-2xl">{t.title}</CardTitle>
+                <CardTitle className="text-2xl">{t.intro}</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col justify-between h-full space-y-7">
                 <div className="space-y-1">
@@ -99,27 +104,51 @@ export default function ClaimPage() {
                   {/* <p className="break-all">{codeHash}</p> */}
                 </div>
 
-                {isConnected ? (
-                  <Button
-                    className="bg-white text-black w-full text-lg py-6 mt-auto hover:bg-blue-400 transition-colors"
-                    onClick={handleClaim}
-                    disabled={claimStatus != ClaimStatus.Registered || txStatus === 'pending'}
-                  >
-                  {txStatus === 'pending' ? (
-                      t.claiming
-                    ) : claimStatus == ClaimStatus.Registered ? (
-                      t.claim
-                    ) : claimStatus == ClaimStatus.Claimed ? (
-                      t.claimed
-                    ) : (
-                      t.invalidCode
-                    )}
-                  </Button>
+                  {isConnected ? (
+                  <>
+
+                    <Button
+                      className="bg-white text-black font-bold w-full text-lg py-6 mt-auto hover:bg-blue-400 hover:text-white transition-colors"
+                      onClick={handleClaim}
+                      disabled={claimStatus !== ClaimStatus.Registered || txStatus === 'pending'}
+                    >
+                      {txStatus === 'pending' ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <span className="loader w-4 h-4 border-2 border-t-transparent rounded-full animate-spin"></span>
+                          {t.claiming}
+                        </div>
+                      ) : claimStatus === ClaimStatus.Registered ? (
+                        t.claim
+                      ) : claimStatus === ClaimStatus.Claimed ? (
+                        txStatus === 'success' ? t.claimed : t.claimedAlready
+                      ) : claimStatus === ClaimStatus.Unregistered ? (
+                        t.invalidCode
+                      ) : (
+                        codeChecked ? t.somethingWentWrong : t.wait
+                      )}
+                    </Button>
+
+                    {/* Explanation below the button */}
+                    <p className="text-sm text-center text-white opacity-70 mt-4">
+                      {claimStatus === ClaimStatus.Registered && txStatus !== 'pending' && t.readyToClaim}
+                      {claimStatus === ClaimStatus.Claimed && txStatus !== 'success' && t.codeHasBeenUsed}
+                      {claimStatus === ClaimStatus.Unregistered && t.codeNotFound}
+                      {claimStatus === null && codeChecked && t.checkNetworkIfWaitingTooLong}
+                      {txStatus === 'pending' && t.confirmTheTransaction}
+                    </p>
+                    <p className="text-sm text-center font-semibold text-red-300 mt-4">
+                      {txStatus === 'error' && t.transactionFailed}
+                    </p>
+                    <p className="text-sm text-center font-semibold text-green-300 mt-4">
+                      {txStatus === 'success' && (t.transactionSuccess + ": " + txHash)}
+                    </p>
+                  </>
                 ) : (
                   <p className="text-sm text-center text-white opacity-80 mt-auto">
                     {t.firstConnectYourWallet}
                   </p>
                 )}
+                
               </CardContent>
             </Card>
           ) : (
