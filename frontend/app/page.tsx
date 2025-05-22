@@ -15,6 +15,12 @@ import airdropAbi from '../contracts/local_zin_airdrop.json';
 
 import t from '../i18n/ru.json';
 
+enum ClaimStatus {
+  Unregistered = 0,
+  Registered = 1,
+  Claimed = 2,
+}
+
 export default function ClaimPage() {
   const searchParams = useSearchParams();
 
@@ -26,7 +32,7 @@ export default function ClaimPage() {
   const { isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
 
-  const [claimable, setClaimable] = useState<boolean | null>(null);
+  const [claimStatus, setClaimStatus] = useState<ClaimStatus | null>(null);
   const [txStatus, setTxStatus] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
 
   const [airdropContract, setAirdropContract] = useState<ethers.Contract | null>(null);
@@ -47,11 +53,12 @@ export default function ClaimPage() {
 
     (async () => {
       try {
-        const result = await airdropContract.canClaim(codeHash);
-        setClaimable(result);
+        const result = await airdropContract.getClaimStatus(codeHash);
+        console.log('Claim status:', result.toString());
+        setClaimStatus(result);
       } catch (err) {
         console.error('Failed to check claimable status:', err);
-        setClaimable(false);
+        setClaimStatus(null);
       }
     })();
   }, [airdropContract, codeHash]);
@@ -64,7 +71,9 @@ export default function ClaimPage() {
       const tx = await airdropContract.claim(codeHash);
       await tx.wait();
       setTxStatus('success');
-      setClaimable(false);
+      // Update claim status
+      const result = await airdropContract.getClaimStatus(codeHash);
+      setClaimStatus(result);
     } catch (err) {
       console.error('Claim failed:', err);
       setTxStatus('error');
@@ -92,11 +101,19 @@ export default function ClaimPage() {
 
                 {isConnected ? (
                   <Button
-                    className="bg-white text-black w-full text-lg py-6 mt-auto"
+                    className="bg-white text-black w-full text-lg py-6 mt-auto hover:bg-blue-400 transition-colors"
                     onClick={handleClaim}
-                    disabled={!claimable || txStatus === 'pending'}
+                    disabled={claimStatus != ClaimStatus.Registered || txStatus === 'pending'}
                   >
-                    {txStatus === 'pending' ? t.claiming : claimable ? t.claim : t.claimed}
+                  {txStatus === 'pending' ? (
+                      t.claiming
+                    ) : claimStatus == ClaimStatus.Registered ? (
+                      t.claim
+                    ) : claimStatus == ClaimStatus.Claimed ? (
+                      t.claimed
+                    ) : (
+                      t.invalidCode
+                    )}
                   </Button>
                 ) : (
                   <p className="text-sm text-center text-white opacity-80 mt-auto">

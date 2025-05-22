@@ -8,5 +8,5 @@ interface ILocalZinAirdrop {
     function registerCode(bytes32 code_hash) external;
     function registerCodes(bytes32[] memory code_hashes) external;
     function claim(bytes32 code_hash) external;
-    function canClaim(bytes32 code_hash) external view returns (bool);
+    function getClaimStatus(bytes32 code_hash) external view returns (uint8);
 }

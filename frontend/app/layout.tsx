@@ -34,9 +34,16 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-black bg-opacity-90 text-foreground antialiased`}
+        className={`
+          ${geistSans.variable} ${geistMono.variable}
+          bg-gradient-to-br from-[#0d1b2a] via-[#1b263b] to-[#415a77]
+          text-white antialiased min-h-screen
+        `}
       >
-        <div className="fixed inset-0 w-full h-full bg-repeat bg-noise opacity-25 bg-[length:350px] z-[-20] before:content-[''] before:absolute before:w-[2500px] before:h-[2500px] before:rounded-full before:blur-[100px] before:-left-[1000px] before:-top-[2000px] before:bg-white before:opacity-50 before:z-[-100]"></div>
+        {/* Background effects */}
+        <div className="fixed inset-0 z-[-10] bg-noise bg-repeat opacity-[0.06]"></div>
+        <div className="absolute w-[100%] h-[100%] rounded-full bg-blue-500 opacity-20 blur-[200px] z-[-20]"></div>
+
         <main className="flex flex-col max-w-screen-lg mx-auto pb-20">
           <Providers initialState={initialState}>
             <Navbar />

@@ -91,6 +91,7 @@ pnpm dev
 cargo stylus export-abi
 npx solc --abi ./abi/local_zin_airdrop.sol -o abi
 ```
+modify generated ABI to `local_zin_airdrop.abi` and `local_zin_airdrop.json` (frontend) files
 
 ### Deployment
 
@@ -99,10 +100,15 @@ npx solc --abi ./abi/local_zin_airdrop.sol -o abi
 2. Deploy the Solidity contract using `npm run deploy:devnet` (testnet) or `npm run deploy:mainnet` (mainnet). 
 Remember the deployed contract address!
 
-3. Deploy the Stylus contract:
+3. Deploy the Stylus contract. Devnet:
 ```shell
 export $(grep -v '^#' ../.env | xargs)
 cargo stylus deploy --endpoint "$ARBITRUM_SEPOLIA_RPC" --private-key "$PRIVATE_KEY" --no-verify
+```
+Mainnet:
+```shell
+export $(grep -v '^#' ../.env | xargs)
+cargo stylus deploy --endpoint "$ARBITRUM_MAINNET_RPC" --private-key "$PRIVATE_KEY" --no-verify
 ```
 Remember the deployed one more contract address!
 

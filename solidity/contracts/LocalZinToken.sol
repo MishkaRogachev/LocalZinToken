@@ -27,12 +27,13 @@ contract LocalZinToken is ERC20, Ownable {
     function mint(address to, uint256 amount) external {
         require(minter != address(0), "Minter should be set before minting");
 
-        require(
-            msg.sender == minter,
-            "Only minter is authorized for mining tokens"
-        );
+        require(msg.sender == minter, "Only minter can mint tokens");
 
         _mint(to, amount);
         emit TokensMinted(to, amount);
+    }
+
+    function decimals() public view virtual override returns (uint8) {
+        return 0;
     }
 }

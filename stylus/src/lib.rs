@@ -2,16 +2,20 @@
 extern crate alloc;
 
 use stylus_sdk::{
-    alloy_primitives::{Address, B256, U256},
+    alloy_primitives::{Address, B256, U256, U8},
     prelude::*,
-    storage::StorageAddress,
+    storage::{StorageAddress, StorageU8},
 };
 
 // Amount of tokens to airdrop
-const TOKENS_TO_AIRDROP: u128 = 1_000_000_000_000_000_000_000; // 1000 * 10^18
-const MAX_CODES_TO_REGISTER: usize = 500;
+const TOKENS_TO_AIRDROP: u128 = 1_000;
 
-sol_interface! {
+#[allow(dead_code)]
+const CODE_UNREGISTERED: u8 = 0x00;
+const CODE_REGISTERED: u8 = 0x01;
+const CODE_CLAIMED: u8 = 0x02;
+
+stylus_sdk::prelude::sol_interface! {
     interface ILocalZinToken {
         function mint(address to, uint256 amount) external;
     }
@@ -20,10 +24,11 @@ sol_interface! {
 sol_storage! {
     #[entrypoint]
     pub struct LocalZinAirdrop {
-        /// Mapping from claim code hash to bool status
-        /// • false → unregistered or claimed
-        /// • true → registered and not yet claimed
-        mapping(B256 => bool) claim_codes;
+        /// Mapping for registered codes
+        /// 0x00 -> unregistered
+        /// 0x01 -> registered, yet unclaimed
+        /// 0x02 -> claimed
+        mapping(B256 => StorageU8) registered_codes;
 
         /// Owner of the contract
         StorageAddress owner;
@@ -58,20 +63,20 @@ impl LocalZinAirdrop {
     pub fn register_code(&mut self, code_hash: B256) -> Result<(), Vec<u8>> {
         self.ensure_owner()?;
 
-        self.claim_codes.setter(code_hash).set(true);
+        self.registered_codes
+            .setter(code_hash)
+            .set(U8::from(CODE_REGISTERED));
         Ok(())
     }
 
     /// Register multiple code hashes at once (only owner)
     pub fn register_codes(&mut self, code_hashes: Vec<B256>) -> Result<(), Vec<u8>> {
-        if code_hashes.len() > MAX_CODES_TO_REGISTER {
-            return Err(b"Too many codes at once".to_vec());
-        }
-
         self.ensure_owner()?;
 
         for code_hash in code_hashes {
-            self.claim_codes.setter(code_hash).set(true);
+            self.registered_codes
+                .setter(code_hash)
+                .set(U8::from(CODE_REGISTERED));
         }
 
         Ok(())
@@ -79,19 +84,21 @@ impl LocalZinAirdrop {
 
     /// Claim a code (only if unclaimed)
     pub fn claim(&mut self, code_hash: B256) -> Result<(), Vec<u8>> {
-        if !self.claim_codes.get(code_hash) {
-            return Err(b"Code not registered or already claimed".to_vec());
+        if self.registered_codes.get(code_hash) != U8::from(CODE_REGISTERED) {
+            return Err(b"Code is not registered or already claimed".to_vec());
         }
 
         self.airdrop(U256::from(TOKENS_TO_AIRDROP), self.vm().msg_sender())?;
-        self.claim_codes.setter(code_hash).set(false);
+        self.registered_codes
+            .setter(code_hash)
+            .set(U8::from(CODE_CLAIMED));
 
         Ok(())
     }
 
-    /// Check if a code can be claimed
-    pub fn can_claim(&self, code_hash: B256) -> bool {
-        self.claim_codes.get(code_hash)
+    /// Check if a code is registered and unclaimed
+    pub fn get_claim_status(&self, code_hash: B256) -> U8 {
+        self.registered_codes.get(code_hash)
     }
 }
 
@@ -162,11 +169,11 @@ mod test {
             hex_to_b256("9c7f0bb206d627b443c6297dc2b547a80c92b7ff9e2c9065dfdbb7aa01ab8f3e");
 
         // Initially not registered
-        assert!(!contract.can_claim(code_hash));
+        assert!(contract.get_claim_status(code_hash) == U8::from(CODE_UNREGISTERED));
 
         // Register hash by owner
         assert!(contract.register_code(code_hash).is_ok());
-        assert!(contract.can_claim(code_hash));
+        assert!(contract.get_claim_status(code_hash) == U8::from(CODE_REGISTERED));
 
         // Set the token address in contract storage
         let token_address =
@@ -182,7 +189,7 @@ mod test {
         //vm.mock_call(token_address, selector.into(), Ok(vec![]));
 
         // // Claim it successfully
-        //assert!(contract.claim(code_hash).is_ok());
+        // assert!(contract.claim(code_hash).is_ok());
         // assert!(!contract.can_claim(code_hash));
 
         // // Reclaim should fail
