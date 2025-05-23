@@ -73,7 +73,7 @@ describe("LocalZinToken", function () {
     const mintAmount = ethers.parseEther("1000");
     await expect(
       token.connect(owner).mint(minter.address, mintAmount)
-    ).to.be.revertedWith("Only minter is authorized for mining tokens");
+    ).to.be.revertedWith("Only minter can mint tokens");
   });
 
   it("should only allow owner to set minter", async function () {

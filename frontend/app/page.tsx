@@ -12,6 +12,7 @@ import { Hero } from '@/components/Hero';
 
 import { AIRDROP_ADDRESS } from '../contracts/config';
 import airdropAbi from '../contracts/local_zin_airdrop.json';
+import WalletInstructions from '@/components/wallet_instructions';
 
 import t from '../i18n/ru.json';
 
@@ -87,9 +88,11 @@ export default function ClaimPage() {
 
   return (
     <main className="">
+
       <div className="flex flex-col gap-8 items-center sm:items-start w-full px-3 md:px-0">
         <Hero />
         <Separator className="w-full my-14 opacity-15" />
+        {isConnected ? (
         <section className="flex flex-col items-center md:flex-row gap-10 w-full justify-center max-w-5xl">
           {codeHash ? (
             <Card className="relative bg-blue-500 bg-opacity-35 rounded-tr-sm rounded-bl-sm text-white border-none h-full w-full max-w-xl self-start min-h-[360px]">
@@ -103,10 +106,7 @@ export default function ClaimPage() {
                   {/* <h3 className="text-lg font-semibold">Your code hash:</h3> */}
                   {/* <p className="break-all">{codeHash}</p> */}
                 </div>
-
-                  {isConnected ? (
                   <>
-
                     <Button
                       className="bg-white text-black font-bold w-full text-lg py-6 mt-auto hover:bg-blue-400 hover:text-white transition-colors"
                       onClick={handleClaim}
@@ -143,12 +143,6 @@ export default function ClaimPage() {
                       {txStatus === 'success' && (t.transactionSuccess + ": " + txHash)}
                     </p>
                   </>
-                ) : (
-                  <p className="text-sm text-center text-white opacity-80 mt-auto">
-                    {t.firstConnectYourWallet}
-                  </p>
-                )}
-                
               </CardContent>
             </Card>
           ) : (
@@ -157,6 +151,9 @@ export default function ClaimPage() {
             </p>
           )}
         </section>
+        ) : (
+          <WalletInstructions />
+        )}
       </div>
     </main>
   );
