@@ -27,12 +27,15 @@ try {
 }
 
 console.log(`Loaded ${codeHashes.length} codes from ${CODES_FILE}`);
-console.log(`Sending in batches of ${MAX_CODES_PER_BATCH} to: ${airdropContract.target}`);
+console.log(`Sending ${codeHashes.length} codes in ${Math.ceil(codeHashes.length / MAX_CODES_PER_BATCH)} batches...`);
 
 async function main() {
   for (let i = 0; i < codeHashes.length; i += MAX_CODES_PER_BATCH) {
     const batch = codeHashes.slice(i, i + MAX_CODES_PER_BATCH);
-    const padded = batch.map((hex) => ethers.getBytes("0x" + hex));
+    const padded = batch.map((hex) => ethers.getBytes(hex.startsWith("0x") ? hex : "0x" + hex));
+
+    // const gas = await airdropContract.registerCodes.estimateGas(padded);
+    // console.log("Estimated gas:", gas.toString());
 
     try {
       const tx = await airdropContract.registerCodes(padded);

@@ -1,1 +1,2 @@
-export const AIRDROP_ADDRESS = "0xf019372561a280c8a6018b2c354d3b03dd9113f9";       // Stylus contract address
+export const AIRDROP_ADDRESS_DEVNET = "0xf019372561a280c8a6018b2c354d3b03dd9113f9";
+export const AIRDROP_ADDRESS_MAINNET = "0x947b339a02fa36ef8f9fee6d5810b2eb5c9d2744";

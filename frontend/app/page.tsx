@@ -1,6 +1,7 @@
 'use client';
 
-import { useAccount, useWalletClient } from 'wagmi';
+import { useAccount, useWalletClient, useChainId } from 'wagmi';
+import { arbitrum, arbitrumSepolia } from "wagmi/chains";
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
@@ -10,7 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Hero } from '@/components/Hero';
 
-import { AIRDROP_ADDRESS } from '../contracts/config';
+import { AIRDROP_ADDRESS_DEVNET, AIRDROP_ADDRESS_MAINNET } from '../contracts/config';
 import airdropAbi from '../contracts/local_zin_airdrop.json';
 import WalletInstructions from '@/components/wallet_instructions';
 
@@ -41,16 +42,30 @@ export default function ClaimPage() {
 
   const [airdropContract, setAirdropContract] = useState<ethers.Contract | null>(null);
 
+  const chainId = useChainId();
+
   useEffect(() => {
     if (!walletClient) return;
   
     (async () => {
       const provider = new ethers.BrowserProvider(walletClient);
       const signer = await provider.getSigner();
-      const contract = new ethers.Contract(AIRDROP_ADDRESS, airdropAbi, signer);
+
+      let contract_address;
+
+      if (chainId === arbitrumSepolia.id) {
+        contract_address = AIRDROP_ADDRESS_DEVNET;
+      } else if (chainId === arbitrum.id) {
+        contract_address = AIRDROP_ADDRESS_MAINNET;
+      } else {
+        console.error("Unsupported chain ID:", chainId);
+        return;
+      }
+
+      const contract = new ethers.Contract(contract_address, airdropAbi, signer);
       setAirdropContract(contract);
     })();
-  }, [walletClient]);
+  }, [walletClient, chainId]);
 
   useEffect(() => {
     if (!airdropContract || !codeHash) return;
