@@ -44,6 +44,9 @@ export default function ClaimPage() {
 
   const chainId = useChainId();
 
+  const [balance, setBalance] = useState<bigint>(ethers.parseEther("0"));
+  const balanceThreshold = ethers.parseEther("0.000002");
+
   useEffect(() => {
     if (!walletClient) return;
   
@@ -51,8 +54,17 @@ export default function ClaimPage() {
       const provider = new ethers.BrowserProvider(walletClient);
       const signer = await provider.getSigner();
 
-      let contract_address;
+      // Reset transaction status
+      setTxHash(null);
+      setTxStatus('idle');
 
+      // Fetch balance
+      const address = await signer.getAddress();
+      const balanceBigInt = await provider.getBalance(address);
+      setBalance(balanceBigInt);
+
+      // Prepare contract instance
+      let contract_address;
       if (chainId === arbitrumSepolia.id) {
         contract_address = AIRDROP_ADDRESS_DEVNET;
       } else if (chainId === arbitrum.id) {
@@ -106,7 +118,7 @@ export default function ClaimPage() {
 
       <div className="flex flex-col gap-8 items-center sm:items-start w-full px-3 md:px-0">
         <Hero />
-        <Separator className="w-full my-14 opacity-15" />
+        <Separator className="w-full my-8 opacity-15" />
         {isConnected ? (
         <section className="flex flex-col items-center md:flex-row gap-10 w-full justify-center max-w-5xl">
           {codeHash ? (
@@ -116,7 +128,7 @@ export default function ClaimPage() {
               <CardHeader>
                 <CardTitle className="text-2xl">{t.intro}</CardTitle>
               </CardHeader>
-              <CardContent className="flex flex-col justify-between h-full space-y-7">
+              <CardContent className="flex flex-col justify-between h-full space-y-5">
                 <div className="space-y-1">
                   {/* <h3 className="text-lg font-semibold">Your code hash:</h3> */}
                   {/* <p className="break-all">{codeHash}</p> */}
@@ -156,6 +168,9 @@ export default function ClaimPage() {
                     </p>
                     <p className="text-sm text-center font-semibold text-green-300 mt-4">
                       {txStatus === 'success' && (t.transactionSuccess + ": " + txHash)}
+                    </p>
+                    <p className="text-sm text-center font-semibold text-orange-300 mt-4">
+                      {balance < balanceThreshold && t.lowBalance}
                     </p>
                   </>
               </CardContent>
